@@ -9,7 +9,8 @@
 export default {
   data() {
     return {
-      title: ''
+      title: '',
+      newTodo:[]
     }
   },
   methods: {
@@ -20,9 +21,6 @@ export default {
           title: this.title,
           completed: false
         }
-
-        localStorage.setItem('newTodo', JSON.stringify(newItem));
-
         this.$emit('add-todo', newItem);
         this.title = '';
       }

@@ -11,12 +11,12 @@
 
     <p class="filter-title">Todo filter</p>
     <select class="filterTodo" v-model="filter">
-      <option v-for="value in select" :value="value">{{ value }}</option>
+      <option v-for="value in select" :key="value.id" :value="value">{{ value }}</option>
     </select>
 
     <Loader v-if="loading"/>
-    <TodoList :todos="arrTodos"
-              v-else-if="arrTodos.length" :test="getLocalStorage"/>
+    <TodoList :todos="filterTodos" :test="setStorage"
+              v-else-if="filterTodos.length"/>
     <p v-else>No Todos or all todos is done! Congratulations!</p>
   </div>
 </template>
@@ -28,7 +28,6 @@ import AddForm from "@/components/AddForm";
 import {eventBus} from "@/main";
 import Loader from "@/components/PreLoader";
 
-
 export default {
   data() {
     return {
@@ -36,36 +35,29 @@ export default {
       loading: false,
       select: ['all', 'completed', 'active'],
       filter: 'all',
-      count: null,
-      locStorage: {},
+      count: null
     }
   },
   mounted() {
-    if (localStorage.getItem('newTodo')) {
-      try {
-        this.arrTodos = JSON.parse(localStorage.getItem('newTodo'));
-      } catch(e) {
-        localStorage.removeItem('newTodo');
-      }
+    if(localStorage.getItem('newTodo') !== null) {
+      this.arrTodos = JSON.parse(localStorage.getItem('newTodo'));
     }
-    // const array = localStorage.getItem('newTodo')
-    // this.arrTodos = JSON.parse(array);
   },
   computed: {
-    getLocalStorage() {
-      return this.arrTodos = JSON.parse(localStorage.getItem('newTodo'))
+    setStorage() {
+      return localStorage.setItem('newTodo', JSON.stringify(this.arrTodos))
     },
-    // filterTodos() {
-    //   if (this.filter === 'all') {
-    //     return this.arrTodos;
-    //   }
-    //   if (this.filter === 'completed') {
-    //     return this.arrTodos.filter(item => item.completed);
-    //   }
-    //   if (this.filter === 'active') {
-    //     return this.arrTodos.filter(item => !item.completed);
-    //   }
-    // },
+    filterTodos() {
+      if (this.filter === 'all') {
+        return this.arrTodos;
+      }
+      if (this.filter === 'completed') {
+        return this.arrTodos.filter(item => item.completed);
+      }
+      if (this.filter === 'active') {
+        return this.arrTodos.filter(item => !item.completed);
+      }
+    },
     checkCompleted() {
       let sum = 0;
       this.arrTodos.forEach(item => {
@@ -82,11 +74,13 @@ export default {
   created() {
     eventBus.$on('remTodo', data => {
       this.arrTodos = this.arrTodos.filter((array) => array.id !== data.id);
+      localStorage.setItem("newTodo", JSON.stringify(this.arrTodos));
     });
   },
   methods: {
     addTodo(data) {
-       this.arrTodos.push(data)
+       this.arrTodos.push(data);
+      //  localStorage.setItem("newTodo", JSON.stringify(this.arrTodos));
     }
   },
   components: {

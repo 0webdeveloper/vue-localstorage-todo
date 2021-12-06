@@ -3,7 +3,7 @@
     <ul>
       <TodoItem
           v-for="(todo,i) in todos"
-          :key="todo.title"
+          :key="todo.id"
           :index="i"
           :items="todo"
       />
